@@ -8,28 +8,46 @@ import {
   Param,
   Patch,
   Post,
+  Session,
   UseInterceptors,
 } from '@nestjs/common';
 import { CreateUserDto, UpdateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
-import { Serialize, SerializeInterceptor } from '../interceptors/serialize.interceptors';
+import {
+  Serialize,
+  SerializeInterceptor,
+} from '../interceptors/serialize.interceptors';
 import { UserDto } from './dtos/user.dto';
+import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class UsersController {
-  constructor(private userService: UsersService) {}
+  constructor(
+    private userService: UsersService,
+    private authService: AuthService,
+  ) {}
 
   @Serialize(UserDto)
   @Post('/signup')
   @HttpCode(201)
-  async createUser(@Body() user: CreateUserDto) {
-    return await this.userService.createUser(user);
+  async createUser(@Body() user: CreateUserDto, @Session() session: any) {
+    const foundUser = await this.authService.signup(user);
+    session.userId = foundUser.id;
+    return foundUser;
   }
   @Serialize(UserDto)
   @Post('/login')
-  async login(@Body() user: CreateUserDto) {
-    return await this.userService.loginUser(user);
+  async login(@Body() user: CreateUserDto, @Session() session: any) {
+    const foundUser = await this.authService.login(user);
+    session.userId = foundUser.id;
+    return foundUser;
   }
+
+  @HttpCode(204)
+  async signout(@Session() session: any) {
+    session.userId = null;
+  }
+
   @Serialize(UserDto)
   @Get('/:id')
   async findUserById(@Param() data: { id: string }) {

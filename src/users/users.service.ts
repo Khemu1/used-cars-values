@@ -12,26 +12,11 @@ export class UsersService {
   constructor(@InjectRepository(User) private repo: Repository<User>) {}
 
   async createUser(data: { email: string; password: string }) {
-    const foundUser = await this.findUsersByEmail(data.email);
-    if (foundUser.length > 0) {
-      throw new BadRequestException('Email already exists');
-    }
     const user = this.repo.create({
       email: data.email,
       password: data.password,
     });
     return await this.repo.save(user);
-  }
-
-  async loginUser(data: { email: string; password: string }) {
-    const user = await this.findUsersByEmail(data.email);
-    if (user.length === 0) {
-      throw new NotFoundException('User not found');
-    }
-    if (user[0].password !== data.password) {
-      throw new NotFoundException('Invalid password');
-    }
-    return user[0];
   }
 
   async findUsersByEmail(email: string) {
