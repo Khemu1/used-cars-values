@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -15,7 +16,7 @@ export class AuthService {
   async signup(data: { email: string; password: string }) {
     const foundUser = await this.usersService.findUsersByEmail(data.email);
     if (foundUser.length > 0) {
-      throw new NotFoundException('Email already exists');
+      throw new BadRequestException('Email already exists');
     }
     const salt = randomBytes(8).toString('hex');
     const hash = (await scrypt(data.password, salt, 32)) as Buffer;
