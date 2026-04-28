@@ -1,7 +1,11 @@
-import { Body, Controller, Get, HttpCode, Param, Patch, Post, Session, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { CreateReportDto } from './dtos/create-report.dto';
 import { ReportsService } from './reports.service';
+import { CurrentUser } from '../users/decorators/current-user.decorator';
+import { User } from '../users/user.entity';
+import { Serialize } from '../interceptors/serialize.interceptors';
+import { ReportDto } from './dtos/report.dto';
 
 @Controller('reports')
 export class ReportsController {
@@ -10,8 +14,9 @@ export class ReportsController {
   @Post()
   @HttpCode(201)
   @UseGuards(AuthGuard)
-  createReport(@Body() newReport: CreateReportDto, @Session() session: Record<string, any>) {
-    return this.reportsService.createReport(newReport, +session.userId);
+  @Serialize(ReportDto)
+  createReport(@Body() newReport: CreateReportDto, @CurrentUser() user: User) {
+    return this.reportsService.createReport(newReport, user.id);
   }
 
   @Get()
@@ -21,8 +26,8 @@ export class ReportsController {
   }
   @Get('my-reports')
   @UseGuards(AuthGuard)
-  findUserReports(@Session() session: Record<string, any>) {
-    return this.reportsService.findUserReports(+session.userId);
+  findUserReports(@CurrentUser() user: User) {
+    return this.reportsService.findUserReports(user.id);
   }
 
   @Get('unapproved')

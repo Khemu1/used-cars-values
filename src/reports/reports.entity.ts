@@ -1,4 +1,4 @@
-import { Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Entity } from 'typeorm';
 import { User } from '../users/user.entity';
 
@@ -6,6 +6,9 @@ import { User } from '../users/user.entity';
 export class Report {
   @PrimaryGeneratedColumn()
   id!: number;
+  @ManyToOne(() => User, (user) => user.reports, { nullable: false })
+  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
+  user!: User;
 
   @Column('double precision', { precision: 10, scale: 2 })
   price!: number;
@@ -35,7 +38,4 @@ export class Report {
   created_at!: Date;
   @Column('datetime', { default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   updated_at!: Date;
-
-  @ManyToOne(() => User, (user) => user.reports)
-  user!: User;
 }
