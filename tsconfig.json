@@ -17,6 +17,7 @@
     "skipLibCheck": true,
     "strictNullChecks": true,
     "types": ["node", "jest"],
+    "typeRoots": ["./src/types", "./node_modules/@types"],
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,

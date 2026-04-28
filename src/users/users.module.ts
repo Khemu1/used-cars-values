@@ -17,7 +17,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     {
       provide: APP_INTERCEPTOR,
       useClass: CurrentUserInterceptor,
-    }, // by doing this any req will have this interceptor applied to it 
+    }, // by doing this any req will have this interceptor applied to it
   ],
 })
 export class UsersModule {}

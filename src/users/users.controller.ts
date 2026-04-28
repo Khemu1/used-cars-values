@@ -30,7 +30,7 @@ export class UsersController {
 
   @Get('/whoami')
   @UseGuards(AuthGuard)
-  async whoami(@CurrentUser() user: User) {
+  whoami(@CurrentUser() user: User) {
     return user;
   }
 
@@ -50,7 +50,7 @@ export class UsersController {
 
   @HttpCode(204)
   @Delete('/signout')
-  async signout(@Session() session: any) {
+  signout(@Session() session: any) {
     session.userId = null;
   }
 
