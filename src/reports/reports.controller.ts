@@ -1,11 +1,11 @@
-import { Body, Controller, Get, HttpCode, Param, Patch, Post, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '../guards/auth.guard';
+import { Body, Controller, Get, HttpCode, Param, Patch, Post, Query, Session } from '@nestjs/common';
 import { CreateReportDto } from './dtos/create-report.dto';
 import { ReportsService } from './reports.service';
-import { CurrentUser } from '../users/decorators/current-user.decorator';
-import { User } from '../users/user.entity';
+import { Role } from '../users/user.entity';
 import { Serialize } from '../interceptors/serialize.interceptors';
 import { ReportDto } from './dtos/report.dto';
+import { WithRoles } from '../decorators/with-roles.decorator';
+import { GetEstimateDto } from './dtos/get-estimate.dto';
 
 @Controller('reports')
 export class ReportsController {
@@ -13,33 +13,42 @@ export class ReportsController {
 
   @Post()
   @HttpCode(201)
-  @UseGuards(AuthGuard)
+  @WithRoles(Role.User)
   @Serialize(ReportDto)
-  createReport(@Body() newReport: CreateReportDto, @CurrentUser() user: User) {
-    return this.reportsService.createReport(newReport, user.id);
+  createReport(@Body() newReport: CreateReportDto, @Session() session: Record<string, any>) {
+    console.log('session', session);
+    return this.reportsService.createReport(newReport, session.userId as number);
   }
 
   @Get()
-  @UseGuards(AuthGuard)
+  @WithRoles(Role.Admin)
   findAll() {
     return this.reportsService.findAll();
   }
   @Get('my-reports')
-  @UseGuards(AuthGuard)
-  findUserReports(@CurrentUser() user: User) {
-    return this.reportsService.findUserReports(user.id);
+  @WithRoles(Role.User)
+  findUserReports(@Session() session: Record<string, any>) {
+    return this.reportsService.findUserReports(session.userId as number);
   }
 
   @Get('unapproved')
-  @UseGuards(AuthGuard)
+  @WithRoles(Role.Admin)
+  @Serialize(ReportDto)
   findUnAprovedReports() {
     return this.reportsService.findUnAprovedReports();
   }
 
   @Patch('approve/:report_id')
   @HttpCode(204)
-  @UseGuards(AuthGuard)
+  @WithRoles(Role.Admin)
   approveReport(@Param('report_id') id: number) {
     return this.reportsService.approveReport(id);
+  }
+
+  @Get('estimate')
+  @WithRoles(Role.User)
+  @Serialize(ReportDto)
+  getEstimate(@Query() data: GetEstimateDto) {
+    return this.reportsService.getEstimate(data);
   }
 }

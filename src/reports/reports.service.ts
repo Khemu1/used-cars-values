@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Report } from './reports.entity';
 import { CreateReportDto } from './dtos/create-report.dto';
+import { GetEstimateDto } from './dtos/get-estimate.dto';
 
 @Injectable()
 export class ReportsService {
@@ -25,9 +26,16 @@ export class ReportsService {
   }
 
   async findUnAprovedReports() {
-    const reports = await this.repo.findBy({
-      approved: false,
+    const reports = await this.repo.find({
+      where: { approved: false },
+      relations: ['user'],
+      select: {
+        user: {
+          id: true,
+        },
+      },
     });
+    console.log('reports', reports);
     return reports;
   }
 
@@ -43,5 +51,21 @@ export class ReportsService {
   async findAll() {
     const reports = await this.repo.find();
     return reports;
+  }
+
+  getEstimate(data: GetEstimateDto) {
+    return this.repo
+      .createQueryBuilder()
+      .select('AVG(price)', 'price')
+      .where('make = :make', { make: data.make })
+      .andWhere('model = :model', { model: data.model })
+      .andWhere('year - :year BETWEEN -5 AND 5', { year: data.year })
+      .andWhere('longitude - :lng BETWEEN -5 AND 5', { lng: data.lng })
+      .andWhere('latitude - :lat BETWEEN -5 AND 5', { lat: data.lat })
+      .andWhere('approved IS TRUE')
+      .orderBy('ABS(mileage - :mileage)', 'DESC')
+      .setParameters({ mileage: data.mileage })
+      .limit(3)
+      .getRawOne();
   }
 }

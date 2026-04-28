@@ -1,20 +1,17 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { User } from './user.entity';
+import { Role, User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class UsersService {
   constructor(@InjectRepository(User) private repo: Repository<User>) {}
 
-  async createUser(data: { email: string; password: string }) {
+  async createUser(data: { email: string; password: string }, role: Role) {
     const user = this.repo.create({
       email: data.email,
       password: data.password,
+      role,
     });
     return await this.repo.save(user);
   }
@@ -32,7 +29,7 @@ export class UsersService {
   async findUserById(id: number) {
     const user = await this.repo.findOne({
       where: { id },
-      select: ['email', 'id'],
+      select: ['email', 'id', 'role'],
     });
     return user;
   }

@@ -1,6 +1,10 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { Report } from '../reports/reports.entity';
 
+export enum Role {
+  Admin = 'admin',
+  User = 'client',
+}
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
@@ -8,6 +12,9 @@ export class User {
 
   @Column('varchar', { length: 255, unique: true })
   email!: string;
+
+  @Column('varchar', { length: 255, default: Role.User })
+  role!: Role;
 
   @Column('varchar', { length: 100 })
   password!: string;
