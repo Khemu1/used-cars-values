@@ -1,10 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-empty */
-import { rmSync } from 'fs';
-import { join } from 'path';
+import { resetTestDatabase } from '../src/scripts/reset_test_database';
 
-global.beforeEach(() => {
-  try {
-    rmSync(join(__dirname, '..', 'db.test.sqlite'));
-  } catch (e) {}
+beforeAll(async () => {
+  await resetTestDatabase();
 });

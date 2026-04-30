@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Report } from '../reports/reports.entity';
 
 export enum Role {
@@ -13,15 +13,19 @@ export class User {
   @Column('varchar', { length: 255, unique: true })
   email!: string;
 
+  @Column('varchar', { length: 255, nullable: true })
+  name!: string | null;
+
   @Column('varchar', { length: 255, default: Role.User })
   role!: Role;
 
   @Column('varchar', { length: 100 })
   password!: string;
 
-  @Column('datetime', { default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn()
   created_at!: Date;
-  @Column('datetime', { default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+
+  @UpdateDateColumn()
   updated_at!: Date;
 
   @OneToMany(() => Report, (report) => report.user)

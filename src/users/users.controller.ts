@@ -42,6 +42,7 @@ export class UsersController {
     return foundUser;
   }
   @Post('/login')
+  @HttpCode(200)
   async login(@Body() user: CreateUserDto, @Session() session: Record<string, any>) {
     const foundUser = await this.authService.login(user);
     session.userId = foundUser.id;

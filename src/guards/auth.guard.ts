@@ -10,6 +10,9 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('Unauthorized');
     }
 
+    req.userId = req.session.userId;
+    req.userRole = req.session.userRole;
+
     return true;
   }
 }

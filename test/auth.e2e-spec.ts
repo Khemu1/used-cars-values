@@ -34,9 +34,10 @@ describe('Auth System', () => {
     const res = await request(app.getHttpServer()).post('/auth/signup').send({ email, password: 'test' }).expect(201);
 
     const cookie = res.get('Set-Cookie') || [];
-
+    console.log('Received cookie:', cookie);
     await request(app.getHttpServer())
-      .get('/auth/whoami')
+      .post('/auth/login')
+      .send({ email, password: 'test' })
       .set('Cookie', cookie)
       .expect(200)
       .then((res) => {

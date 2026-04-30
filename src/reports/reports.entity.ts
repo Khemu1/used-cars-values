@@ -1,4 +1,4 @@
-import { Column, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Entity } from 'typeorm';
 import { User } from '../users/user.entity';
 
@@ -10,16 +10,16 @@ export class Report {
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user!: User;
 
-  @Column('double precision', { precision: 10, scale: 2 })
+  @Column('numeric', { precision: 10, scale: 2 })
   price!: number;
 
-  @Column('double precision', { precision: 10, scale: 2 })
+  @Column('numeric', { precision: 10, scale: 2 })
   mileage!: number;
 
-  @Column('double precision', { precision: 10, scale: 2 })
+  @Column('numeric', { precision: 10, scale: 2 })
   longitude!: number;
 
-  @Column('double precision', { precision: 10, scale: 2 })
+  @Column('numeric', { precision: 10, scale: 2 })
   latitude!: number;
 
   @Column('varchar', { length: 255 })
@@ -34,8 +34,9 @@ export class Report {
   @Column('boolean', { default: false })
   approved!: boolean;
 
-  @Column('datetime', { default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn()
   created_at!: Date;
-  @Column('datetime', { default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+
+  @UpdateDateColumn()
   updated_at!: Date;
 }
